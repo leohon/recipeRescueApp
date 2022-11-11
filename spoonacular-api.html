@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spoonacular api practice call</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>Recipe Rescue</h1>
+    </header>
+
+    <div class="form"></div>
+    <form class="inputIngredients" action="">
+
+        <label for="userInput">Enter 3-5 Ingredients, Seperated by Commas</label>
+        <input type="text" name="input1" id="userInput" placeholder="Enter your ingredients">
+
+        <button type="submit" id="submit">Find Recipes!</button>
+    </form>
+    </div>
+
+    <div class="recipeList">
+        <h2>Recipes for You to Try!</h2>
+        <ul>
+        </ul>
+    </div>
+
+
+
+    <script>
+        // namespace: recipeRescue object
+        const recipeRescue = {};
+        // api key
+        const foodAppKey = "f7e6e031ca8b40dea61881ae0346b75b";
+
+        // init method 
+        recipeRescue.init = function () {
+            recipeRescue.searchRecipes();
+        };
+
+        // search for recipes from user input
+        recipeRescue.searchRecipes = function (userInput) {
+            // make a call to the api
+            const searchRecipesUrl = new URL("https://api.spoonacular.com/recipes/findByIngredients");
+            // search params
+            searchRecipesUrl.search = new URLSearchParams({
+                apiKey: foodAppKey,
+                ingredients: userInput
+            });
+
+            fetch(searchRecipesUrl)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (jsonResults) {
+                    console.log(jsonResults);
+                    // recipeRescue.getRecipes(716429);
+                    // recipeRescue.displayRecipes(jsonResults);
+
+                });
+        };
+
+        // get recipe url from recipe results 
+        recipeRescue.getRecipes = function (id) {
+            const getRecipesUrl = new URL(`https://api.spoonacular.com/recipes/${id}/information`);
+            getRecipesUrl.search = new URLSearchParams({
+                apiKey: foodAppKey,
+            });
+
+            fetch(getRecipesUrl)
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (jsonResults) {
+                    console.log(jsonResults.sourceUrl)
+                    // return jsonResults.sourceUrl;
+                })
+        };
+
+        recipeRescue.displayRecipes = function (recipes) {
+            recipes.forEach(function (recipe) {
+                // create an h3
+                const recipeTitle = document.createElement("h3");
+                // add the recipe name to the h3
+                recipeTitle.innerText = recipe.title;
+                // //create the image element for the recipe image
+                const recipeImage = document.createElement("img");
+                // // add the recipe image to the image element
+                recipeImage.src = recipe.image;
+                // create the li for our html ul
+                const recipeBox = document.createElement("li");
+                // append h3 and image to li
+                recipeBox.appendChild(recipeTitle);
+                recipeBox.appendChild(recipeImage);
+
+                // create variable to hold ul element
+                const ulElement = document.querySelector("ul")
+                // append li to ul
+                ulElement.appendChild(recipeBox);
+            })
+        };
+
+        recipeRescue.getUserInput = function () {
+            // listen for when the user submits ingredients
+            // get the value of the user input
+            const formElement = document.querySelector("form");
+            const inputElement = document.querySelector("input");
+            formElement.addEventListener("submit", function () {
+                const userInput = inputElement.value;
+                recipeRescue.getRecipes(userInput);
+
+            })
+        }
+
+
+
+
+        //calling init method
+        recipeRescue.init();
+
+    </script>
+</body>
+
+</html>
